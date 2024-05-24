@@ -1,0 +1,12 @@
+run_config:
+  name: face-recognition-on-cloud
+  author: Kate Yee
+  version: initial
+  description: Classifies clouds into one of two types.
+  dependencies: requirements.txt
+
+preprocess:
+  upload: True
+  bucket_name: udn3315-test-0
+  raw_prefix: raw
+  refined_prefix: refined
