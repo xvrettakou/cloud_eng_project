@@ -39,6 +39,6 @@ def evaluate_model(model, x_test, y_test, save_path):
     except ValueError as e:
         logger.error("Value error during model evaluation: %s", e)
         return None, None, None, None
-    except FileNotFoundError as e:
-        logger.error("File not found during model evaluation: %s", e)
+    except OSError as e:
+        logger.error("OS error during model evaluation: %s", e)
         return None, None, None, None
