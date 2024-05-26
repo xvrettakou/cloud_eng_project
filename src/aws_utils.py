@@ -1,58 +1,32 @@
-from pathlib import Path
-import pandas as pd
-import logging
 import boto3
+import os
+import logging
 
 logger = logging.getLogger(__name__)
 
-
-def download_from_raw(filename: str, config: dict) -> None:
-    """***
-
-    Args:
-        ***
-
-    Returns:
-        ***
+def download_refined_data(bucket_name, s3_key, local_path):
     """
-    s3_client = boto3.client("s3")
-
-    bucket_name: str = config["bucket_name"]
-    object_key: Path = config["raw_prefix"] / filename
-    download_path: str = "data" / filename
-
+    Download refined data from S3 to a local path.
+    """
+    s3 = boto3.client('s3')
     try:
-        s3_client.download_file(bucket_name, object_key, download_path)
-        print(f"File downloaded successfully to {download_path}")
+        s3.download_file(bucket_name, s3_key, local_path)
+        logger.info("Downloaded %s from S3 bucket %s to %s", s3_key, bucket_name, local_path)
     except Exception as e:
-        print(f"Error downloading file: {e}")
+        logger.error("Error downloading %s from S3 bucket %s: %s", s3_key, bucket_name, e)
 
-def upload_to_refined(filename: str, config: dict) -> str:
-    """***
-
-    Args:
-        ***
-
-    Returns:
-        ***
+def upload_artifacts(artifacts_dir, bucket_name, s3_prefix):
     """
-
-    s3_client = boto3.client("s3")
-
-    
-    bucket_name: str = config["bucket_name"]
-    prefix: str = config["refined_prefix"]
-    uri: str = ""
-
-    file_path: str = f"data/{filename}"
-    key = f"{prefix}/{filename}"
+    Upload all artifacts in the specified directory to an S3 bucket.
+    """
+    s3 = boto3.client('s3')
     try:
-        s3_client.upload_file(file_path, bucket_name, key)
-    except boto3.exceptions.S3UploadFailedError as exc:
-        logger.error("The specified bucket does not exist.")
-        raise boto3.exceptions.S3UploadFailedError from exc
-    uri = f"s3://{bucket_name}/{key}"
-    logging.info("Uploaded %s to %s", file_path, uri)
-
-    return uri
-
+        for root, dirs, files in os.walk(artifacts_dir):
+            for file in files:
+                local_path = os.path.join(root, file)
+                relative_path = os.path.relpath(local_path, artifacts_dir)
+                s3_path = os.path.join(s3_prefix, relative_path)
+                s3.upload_file(local_path, bucket_name, s3_path)
+                logger.info("Uploaded %s to s3://%s/%s", local_path, bucket_name, s3_path)
+    except Exception as e:
+        logger.error("Error uploading artifacts from %s to S3 bucket %s: %s", artifacts_dir, bucket_name, e)

@@ -1,0 +1,28 @@
+aws:
+  artifacts_bucket_name: wqj1453-artifacts-project
+  aws_profile: nustudent-sso
+  data_bucket_name: wqj1453-cloud-project
+  upload: true
+model_evaluation:
+  evaluation_metrics:
+  - auc: true
+  - accuracy: true
+  - confusion: true
+  - classification_rep: true
+model_training:
+  data_path: path/to/your/training/data.csv
+  model_save_path: path/to/save/your/model
+  n_estimators: 100
+  random_state: 42
+  stratify: true
+  test_size: 0.2
+project_info:
+  author: Xenia Vrettakou
+  dependencies: requirements.txt
+  description: Classifies clouds into one of two types.
+  name: face-recognition-on-cloud
+  version: initial
+run_config:
+  data_s3_key: wqj1453-cloud-project/icml_face_data.csv
+  output: output_runs
+  target_column: emotions

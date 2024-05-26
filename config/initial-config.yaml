@@ -1,15 +1,9 @@
-run_config:
+project_info:
   name: face-recognition-on-cloud
-  author: Kate Yee
+  author: Xenia Vrettakou
   version: initial
   description: Classifies clouds into one of two types.
   dependencies: requirements.txt
-
-preprocess:
-  upload: True
-  bucket_name: udn3315-test-0
-  raw_prefix: raw
-  refined_prefix: refined
 
 model_training:
   data_path: "path/to/your/training/data.csv"  # Path to the training data
@@ -20,17 +14,20 @@ model_training:
   n_estimators: 100  
 
 model_evaluation:
-  model_path: "path/to/your/model.pkl"
-  test_data_path: "path/to/your/test/data.csv"
   evaluation_metrics:
-    - "auc"
-    - "accuracy"
-    - "confusion"
-    - "classification_rep"
+    - auc: true
+    - accuracy: true
+    - confusion: true
+    - classification_rep: true
 
 aws:
-  s3_bucket: "your-s3-bucket-name"
-  s3_data_prefix: "path/to/data"
-  s3_model_prefix: "path/to/models"
-  region_name: "your-aws-region"
+  data_bucket_name: wqj1453-cloud-project # S3 bucket for refined data
+  artifacts_bucket_name: wqj1453-artifacts-project # S3 bucket for storing artifacts
+  aws_profile: nustudent-sso
+  upload: true
+
+run_config:
+  data_s3_key: "wqj1453-cloud-project/icml_face_data.csv"
+  target_column: "emotions"
+  output: "output_runs"
 
