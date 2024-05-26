@@ -4,23 +4,15 @@ import logging.config
 import os
 import sys
 from pathlib import Path
-
 import yaml
-import boto3
 import pandas as pd
-
 from src import aws_utils as aws
 from src import train_model as tm
-from src import model_score as ms
 from src import model_evaluation as me
+from src import model_score as ms
 
-# Ensure the logs directory exists
-log_dir = Path("logs")
-log_dir.mkdir(parents=True, exist_ok=True)
-
-# Set up logging configuration
 logging.config.fileConfig("config/logging/local.conf")
-logger = logging.getLogger("clouds_pipeline")
+logger = logging.getLogger("pipeline")
 
 def main(config_path):
     # Load configuration file for parameters and run config
@@ -46,16 +38,26 @@ def main(config_path):
     artifacts = Path(run_config.get("output", "output_runs")) / str(now)
     artifacts.mkdir(parents=True)
 
-    # Save config file to artifacts directory for traceability
-    with (artifacts / "config.yaml").open("w") as f:
-        yaml.dump(config, f)
-
     # Download refined data from S3
     refined_data_path = artifacts / "refined_data.csv"
-    aws.download_refined_data(aws_config["data_bucket_name"], run_config["data_s3_key"], refined_data_path)
+    try:
+        logger.info("Downloading refined data from S3...")
+        aws.download_refined_data(aws_config["data_bucket_name"], run_config["data_s3_key"], refined_data_path)
+        logger.info("Refined data downloaded successfully.")
+    except Exception as e:
+        logger.error("Failed to download refined data from S3: %s", e)
+        sys.exit(1)
 
     # Load the data
-    data = pd.read_csv(refined_data_path)
+    try:
+        data = pd.read_csv(refined_data_path)
+    except FileNotFoundError as e:
+        logger.error("Failed to find the refined data file: %s", e)
+        sys.exit(1)
+    except Exception as e:
+        logger.error("Failed to load the refined data: %s", e)
+        sys.exit(1)
+
     x_data = data.drop(columns=run_config["target_column"])
     y_data = data[run_config["target_column"]]
 
@@ -66,7 +68,7 @@ def main(config_path):
         sys.exit(1)
 
     # Train the model
-    model_save_path = config.get("model_training", {}).get("model_save_path", "model.pkl")
+    model_save_path = config.get("model_training", {}).get("model_save_path", artifacts / "model.pkl")
     model = tm.train_model(x_train, y_train, x_val, y_val, model_save_path)
     if model is None:
         logger.error("Model training failed. Exiting pipeline.")
