@@ -1,6 +1,7 @@
 import logging
 from pathlib import Path
 import joblib
+import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 
@@ -24,7 +25,11 @@ def split_data(x_data, y_data, test_size=0.2, random_state=42, stratify=True):
 def train_model(x_train, y_train, x_val, y_val, save_path):
     """Train a Random Forest classifier and save the model."""
     try:
-        # Flatten the images for the classifier
+        # Convert DataFrame to NumPy array if needed and flatten the images for the classifier
+        if isinstance(x_train, pd.DataFrame):
+            x_train = x_train.to_numpy()
+        if isinstance(x_val, pd.DataFrame):
+            x_val = x_val.to_numpy()
         x_train_flat = x_train.reshape(x_train.shape[0], -1)
         x_val_flat = x_val.reshape(x_val.shape[0], -1)
 
@@ -38,10 +43,14 @@ def train_model(x_train, y_train, x_val, y_val, save_path):
         logger.info("Validation score: %s", val_score)
 
         # Save the trained model
-        Path(save_path).mkdir(parents=True, exist_ok=True)
-        model_path = Path(save_path) / "trained_model.pkl"
-        joblib.dump(clf, model_path)
-        logger.info("Model saved to %s", model_path)
+        try:
+            Path(save_path).mkdir(parents=True, exist_ok=True)
+            model_path = Path(save_path) / "trained_model.pkl"
+            joblib.dump(clf, model_path)
+            logger.info("Model saved to %s", model_path)
+        except (FileNotFoundError, OSError) as e:
+            logger.error("Error occurred while saving the model: %s", e)
+            return None
 
         return clf
 

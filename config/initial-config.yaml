@@ -10,3 +10,27 @@ preprocess:
   bucket_name: udn3315-test-0
   raw_prefix: raw
   refined_prefix: refined
+
+model_training:
+  data_path: "path/to/your/training/data.csv"  # Path to the training data
+  model_save_path: "path/to/save/your/model"   # Directory where the trained model will be saved
+  test_size: 0.2                               # Proportion of data to be used for validation
+  random_state: 42                             # Random state for reproducibility
+  stratify: True                               # Whether to stratify the split based on the labels
+  n_estimators: 100  
+
+model_evaluation:
+  model_path: "path/to/your/model.pkl"
+  test_data_path: "path/to/your/test/data.csv"
+  evaluation_metrics:
+    - "auc"
+    - "accuracy"
+    - "confusion"
+    - "classification_rep"
+
+aws:
+  s3_bucket: "your-s3-bucket-name"
+  s3_data_prefix: "path/to/data"
+  s3_model_prefix: "path/to/models"
+  region_name: "your-aws-region"
+
