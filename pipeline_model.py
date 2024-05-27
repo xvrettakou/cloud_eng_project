@@ -51,17 +51,27 @@ def split_and_train_model(x_data, y_data, config, artifacts):
     return model, x_val, y_val
 
 def score_and_evaluate_model(model, x_val, y_val, artifacts):
-    """Score and evaluate the model, saving the results."""
-    x_val_flat = x_val.values.reshape(x_val.shape[0], -1)
-    scoring_results = ms.score_model(model, x_val_flat, artifacts)
-    if scoring_results is None:
-        logger.error("Model scoring failed. Exiting pipeline.")
-        sys.exit(1)
+    """Score the model, evaluate its performance, and save the results."""
+    try:
+        x_val_flat = x_val.values.reshape(x_val.shape[0], -1)
+        scoring_results = ms.score_model(model, x_val_flat, artifacts)
+        if scoring_results is None:
+            logger.error("Model scoring failed. Exiting pipeline.")
+            sys.exit(1)
+        
+        val_predictions = scoring_results["predictions"]  # Get predictions from scoring results
 
-    evaluation_results_path = artifacts / "evaluation_results.txt"
-    evaluation_results = me.evaluate_model(model, x_val, y_val, evaluation_results_path)
-    if evaluation_results is None:
-        logger.error("Model evaluation failed. Exiting pipeline.")
+        evaluation_results_path = artifacts / "evaluation_results.txt"
+        accuracy, class_report, conf_matrix = me.evaluate_model(y_val, val_predictions, evaluation_results_path)
+        if accuracy is None:
+            logger.error("Model evaluation failed. Exiting pipeline.")
+            sys.exit(1)
+
+    except ValueError as e:
+        logger.error("Value error during model evaluation: %s", e)
+        sys.exit(1)
+    except OSError as e:
+        logger.error("OS error during model evaluation: %s", e)
         sys.exit(1)
 
 def upload_artifacts_if_needed(artifacts, aws_config):

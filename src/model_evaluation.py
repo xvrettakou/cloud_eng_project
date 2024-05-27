@@ -1,46 +1,52 @@
 import logging
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from pathlib import Path
-from sklearn.metrics import roc_auc_score, accuracy_score, confusion_matrix, classification_report
 
 # Set up logging configuration
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def evaluate_model(model, x_test, y_test, output_path):
+def evaluate_model(y_val, val_predictions, evaluation_results_path):
     """Evaluate the trained model's performance and save the results."""
     try:
-        initial_features = x_test.columns.tolist()  # Use all features
-        logger.info(f"Initial features: {initial_features}")
+        # Calculate performance metrics
+        accuracy = accuracy_score(y_val, val_predictions)
+        class_report = classification_report(y_val, val_predictions, target_names=[
+            'Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral'
+        ])
+        conf_matrix = confusion_matrix(y_val, val_predictions)
 
-        # Ensure that the test data contains the required initial features
-        if not set(initial_features).issubset(x_test.columns):
-            raise ValueError("Test data does not contain all required initial features")
+        # Print performance metrics
+        logger.info(f"Validation Accuracy: {accuracy:.4f}")
+        logger.info("Classification Report:\n" + class_report)
 
-        y_pred_proba = model.predict_proba(x_test[initial_features])[:, 1]
-        y_pred = model.predict(x_test[initial_features])
+        # Save evaluation results to the specified path
+        with open(evaluation_results_path, "w") as file:
+            file.write(f"Validation Accuracy: {accuracy:.4f}\n")
+            file.write("Classification Report:\n" + class_report + "\n")
+            file.write("Confusion Matrix:\n" + str(conf_matrix) + "\n")
 
-        auc = roc_auc_score(y_test, y_pred_proba)
-        accuracy = accuracy_score(y_test, y_pred)
-        confusion = confusion_matrix(y_test, y_pred)
-        classification_rep = classification_report(y_test, y_pred)
+        # Plot confusion matrix
+        plt.figure(figsize=(10, 8))
+        sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', xticklabels=[
+            'Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral'
+        ], yticklabels=[
+            'Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral'
+        ])
+        plt.xlabel('Predicted')
+        plt.ylabel('True')
+        plt.title('Confusion Matrix')
+        plt.savefig(evaluation_results_path.parent / "confusion_matrix.png")
+        plt.close()
 
-        output_path = Path(output_path)
-        logger.info(f"Output path for evaluation results: {output_path}")
-        output_path.parent.mkdir(parents=True, exist_ok=True)  # Ensure the directory exists
-
-        # Save the results
-        with open(output_path, "w") as file:
-            file.write(f"AUC: {auc}\n")
-            file.write(f"Accuracy: {accuracy}\n")
-            file.write(f"Confusion Matrix:\n{confusion}\n")
-            file.write(f"Classification Report:\n{classification_rep}\n")
-
-        logger.info("Model evaluation completed successfully and results saved.")
-        return auc, accuracy, confusion, classification_rep
+        logger.info("Model evaluation completed successfully.")
+        return accuracy, class_report, conf_matrix
 
     except ValueError as e:
         logger.error("Value error during model evaluation: %s", e)
-        return None, None, None, None
-    except OSError as e:
-        logger.error("OS error during model evaluation: %s", e)
-        return None, None, None, None
+        return None, None, None
+    except Exception as e:
+        logger.error("An error occurred during model evaluation: %s", e)
+        return None, None, None

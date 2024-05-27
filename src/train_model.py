@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def split_data(x_data, y_data, test_size=0.2, random_state=42, stratify=True):
-    """Split the data into training and validation sets."""
+    """Split the data into training, validation and test sets."""
     try:
         stratify_param = y_data if stratify else None
         x_train, x_val, y_train, y_val = train_test_split(
