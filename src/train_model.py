@@ -65,6 +65,3 @@ def train_model(x_train, y_train, x_val, y_val, save_path):
     except ValueError as value_error:
         logger.error("ValueError occurred during model training: %s", value_error)
         return None
-    except Exception as e:
-        logger.error("Unexpected error occurred during model training: %s", e)
-        return None

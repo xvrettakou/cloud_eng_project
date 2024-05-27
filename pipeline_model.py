@@ -16,10 +16,10 @@ logger = logging.getLogger("pipeline")
 
 def preprocess_data(data, target_column):
     """Preprocess the data by splitting the 'pixels' column and extracting the target column."""
-    x_data = data['pixels'].apply(lambda x: [int(pixel) for pixel in x.split()])
+    x_data = data["pixels"].apply(lambda x: [int(pixel) for pixel in x.split()])
     x_data = pd.DataFrame(x_data.tolist())
     y_data = data[target_column]
-    logger.info(f"Features shape: {x_data.shape}, Target shape: {y_data.shape}")
+    logger.info("Features shape: %s, Target shape: %s", x_data.shape, y_data.shape)
     return x_data, y_data
 
 def download_data(bucket_name, s3_key, local_path):
@@ -27,22 +27,20 @@ def download_data(bucket_name, s3_key, local_path):
     try:
         aws.download_refined_data(bucket_name, s3_key, local_path)
         logger.info("Refined data downloaded successfully.")
-    except Exception as e:
-        logger.error("Failed to download refined data from S3: %s", e)
+    except FileNotFoundError as e:
+        logger.error("Failed to download refined data from S3: File not found - %s", e)
         sys.exit(1)
 
-def split_and_train_model(x_data, y_data, config, artifacts):
+def split_and_train_model(x_data, y_data, artifacts):
     """Split the data into training and validation sets, then train the model."""
     x_train, x_val, y_train, y_val = tm.split_data(x_data, y_data)
     if x_train is None:
         logger.error("Data splitting failed. Exiting pipeline.")
         sys.exit(1)
-    
-    logger.info(f"x_train shape: {x_train.shape}")
-    logger.info(f"y_train shape: {y_train.shape}")
-    logger.info(f"x_val shape: {x_val.shape}")
-    logger.info(f"y_val shape: {y_val.shape}")
-    
+    logger.info("x_train shape: %s", x_train.shape)
+    logger.info("y_train shape: %s", y_train.shape)
+    logger.info("x_val shape: %s", x_val.shape)
+    logger.info("y_val shape: %s", y_val.shape)
     model_save_path = artifacts / "trained_model.pkl"
     model = tm.train_model(x_train, y_train, x_val, y_val, model_save_path)
     if model is None:
@@ -58,11 +56,9 @@ def score_and_evaluate_model(model, x_val, y_val, artifacts):
         if scoring_results is None:
             logger.error("Model scoring failed. Exiting pipeline.")
             sys.exit(1)
-        
         val_predictions = scoring_results["predictions"]  # Get predictions from scoring results
-
         evaluation_results_path = artifacts / "evaluation_results.txt"
-        accuracy, class_report, conf_matrix = me.evaluate_model(y_val, val_predictions, evaluation_results_path)
+        accuracy = me.evaluate_model(y_val, val_predictions, evaluation_results_path)
         if accuracy is None:
             logger.error("Model evaluation failed. Exiting pipeline.")
             sys.exit(1)
@@ -80,11 +76,11 @@ def upload_artifacts_if_needed(artifacts, aws_config):
         aws.upload_artifacts(artifacts, aws_config["artifacts_bucket_name"], "artifacts")
 
 def main(config_path):
-    # Load configuration file for parameters and run config
+    """ Load configuration file for parameters and run config """
     with open(config_path, "r") as f:
         try:
             config = yaml.load(f, Loader=yaml.FullLoader)
-        except yaml.YAMLError as e:
+        except yaml.YAMLError:
             logger.error("Error while loading configuration from %s", config_path)
             sys.exit(1)
         else:
@@ -110,17 +106,14 @@ def main(config_path):
     # Load the data
     try:
         data = pd.read_csv(refined_data_path)
-        logger.info(f"Columns in the DataFrame: {data.columns}")
+        logger.info("Columns in the DataFrame: %s", data.columns)
     except FileNotFoundError as e:
         logger.error("Failed to find the refined data file: %s", e)
-        sys.exit(1)
-    except Exception as e:
-        logger.error("Failed to load the refined data: %s", e)
         sys.exit(1)
 
     x_data, y_data = preprocess_data(data, run_config["target_column"])
 
-    model, x_val, y_val = split_and_train_model(x_data, y_data, config, artifacts)
+    model, x_val, y_val = split_and_train_model(x_data, y_data, artifacts)
     score_and_evaluate_model(model, x_val, y_val, artifacts)
     upload_artifacts_if_needed(artifacts, aws_config)
 
