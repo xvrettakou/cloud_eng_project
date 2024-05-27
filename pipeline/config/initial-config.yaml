@@ -1,0 +1,31 @@
+project_info:
+  name: face-recognition-on-cloud
+  author: Xenia Vrettakou
+  version: initial
+  description: Classifies clouds into one of two types.
+  dependencies: requirements.txt
+
+model_training:
+  data_path: "wqj1453-cloud-project/train.csv"  # Path to the training data
+  test_size: 0.2                               # Proportion of data to be used for validation
+  random_state: 42                             # Random state for reproducibility
+  stratify: True                               # Whether to stratify the split based on the labels
+  n_estimators: 100  
+
+model_evaluation:
+  evaluation_metrics:
+    - auc: true
+    - accuracy: true
+    - confusion: true
+    - classification_rep: true
+
+aws:
+  data_bucket_name: wqj1453-cloud-project # S3 bucket for refined data
+  artifacts_bucket_name: wqj1453-artifacts-project # S3 bucket for storing artifacts
+  aws_profile: nustudent-sso
+  upload: true
+
+run_config:
+  data_s3_key: "train.csv"
+  target_column: "emotion"
+  output: "output_runs"
