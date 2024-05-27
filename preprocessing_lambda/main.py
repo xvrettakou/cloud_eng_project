@@ -1,66 +1,58 @@
-import json
+import csv
+import io
+import os
 import boto3
-import pandas as pd
-from io import StringIO
-from PIL import Image
 import numpy as np
+import pandas as pd
+from PIL import Image, ImageOps
 
 s3 = boto3.client('s3')
 
-def lambda_handler(event, context):
-    # Extract bucket name and object key from the event
-    bucket = event['Records'][0]['s3']['bucket']['name']
-    key = event['Records'][0]['s3']['object']['key']
+# Data augmentation function
+def augment_image(image):
+    '''Augment a given image with rotation and reflection'''
+    augmented_images:list = [image]
+    augmented_images.append(ImageOps.mirror(image))
+    augmented_images.append(image.rotate(15))
+    augmented_images.append(image.rotate(-15))
+    return augmented_images
 
-    # Download the CSV file from S3
-    response = s3.get_object(Bucket=bucket, Key=key)
+# Lambda handler
+def lambda_handler(event, context):
+    '''Data agumentation from csv in S3 to new csv in S3'''
+    source_bucket = event['Records'][0]['s3']['bucket']['name']
+    source_key = event['Records'][0]['s3']['object']['key']
+    dest_bucket = 'udn3315-test-0'
+    dest_key = f'augmented_{os.path.basename(source_key)}'
+
+    # Download CSV file from S3
+    response = s3.get_object(Bucket=source_bucket, Key=source_key)
     csv_content = response['Body'].read().decode('utf-8')
 
-    # Read the CSV content into a pandas DataFrame
-    df = pd.read_csv(StringIO(csv_content))
+    # Read CSV content
+    dataframe = pd.read_csv(io.StringIO(csv_content))
 
-    # Split the data into train, public test, and private test datasets
-    train_df = df[df[' Usage'] == 'Training']
-    pubtest_df = df[df[' Usage'] == 'PublicTest']
-    privtest_df = df[df[' Usage'] == 'PrivateTest']
+    # Create an output buffer
+    output_buffer = io.StringIO()
+    writer = csv.writer(output_buffer)
+    writer.writerow(['emotion', 'pixels'])
 
-    # Data augmentation for the training set
-    augmented_images = []
-    for _, row in train_df.iterrows():
-        pixels = list(map(int, row['pixels'].split()))
-        image = Image.fromarray(np.array(pixels).reshape(48, 48))
-        augmented_images.extend(augment_image(image))
+    for index, row in dataframe.iterrows():
+        emotion = row['emotion']
+        pixels = list(map(int, row[' pixels'].split()))
+        image = Image.fromarray(np.array(pixels).reshape(48, 48).astype('uint8'))
 
-    augmented_train_df = pd.DataFrame(augmented_images, columns=train_df.columns)
+        augmented_images = augment_image(image)
 
-    # Combine original and augmented data
-    final_train_df = pd.concat([train_df, augmented_train_df], ignore_index=True)
+        for aug_image in augmented_images:
+            aug_pixels = np.array(aug_image).flatten()
+            aug_pixels_str = ' '.join(map(str, aug_pixels))
+            writer.writerow([emotion, aug_pixels_str])
 
-    # Save dataframes back to CSV and upload to S3
-    upload_csv_to_s3(final_train_df, bucket, 'train_augmented.csv')
-    upload_csv_to_s3(pubtest_df, bucket, 'public_test.csv')
-    upload_csv_to_s3(privtest_df, bucket, 'private_test.csv')
+    # Upload the augmented data to the destination S3 bucket
+    s3.put_object(Bucket=dest_bucket, Key=dest_key, Body=output_buffer.getvalue())
 
     return {
         'statusCode': 200,
-        'body': json.dumps('Data processed and uploaded successfully')
+        'body': f'Augmented data saved to s3://{dest_bucket}/{dest_key}'
     }
-
-def augment_image(image):
-    augmented_images = []
-    transformations = [Image.FLIP_LEFT_RIGHT, Image.FLIP_TOP_BOTTOM, Image.ROTATE_90, Image.ROTATE_180, Image.ROTATE_270]
-
-    for transform in transformations:
-        augmented_image = image.transpose(transform)
-        augmented_images.append({
-            'emotion': image['emotion'],
-            'Usage': 'Training',
-            'pixels': ' '.join(map(str, augmented_image.flatten().tolist()))
-        })
-
-    return augmented_images
-
-def upload_csv_to_s3(df, bucket, key):
-    csv_buffer = StringIO()
-    df.to_csv(csv_buffer, index=False)
-    s3.put_object(Bucket=bucket, Key=key, Body=csv_buffer.getvalue())
