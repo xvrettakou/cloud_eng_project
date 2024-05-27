@@ -6,7 +6,7 @@ project_info:
   dependencies: requirements.txt
 
 model_training:
-  data_path: "wqj1453-cloud-project/icml_face_data.csv"  # Path to the training data
+  data_path: "wqj1453-cloud-project/train.csv"  # Path to the training data
   model_save_path: "wqj1453-artifacts-project"   # Directory where the trained model will be saved
   test_size: 0.2                               # Proportion of data to be used for validation
   random_state: 42                             # Random state for reproducibility
@@ -27,6 +27,6 @@ aws:
   upload: true
 
 run_config:
-  data_s3_key: "icml_face_data.csv"
-  target_column: "emotions"
+  data_s3_key: "train.csv"
+  target_column: "emotion"
   output: "output_runs"
