@@ -11,6 +11,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Connect to source code and configuration file
 COPY config config 
 COPY src src
+COPY logs logs
 
 # Run main.py when the container launches
 CMD ["python", "src/main.py"]

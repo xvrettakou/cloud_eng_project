@@ -22,7 +22,6 @@ model_evaluation:
 aws:
   data_bucket_name: wqj1453-cloud-project # S3 bucket for refined data
   artifacts_bucket_name: wqj1453-artifacts-project # S3 bucket for storing artifacts
-  aws_profile: nustudent-sso
   upload: true
 
 run_config:
