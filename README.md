@@ -89,21 +89,15 @@ During that process, the trained model and associated artifacts will be uploaded
 ### Inference Web Application
 ![Phase3](./images/phase3.png)
 
-1. Create a new ECR registry and use the push commands from the `pipeline/` directory to build and push the model training pipeline to ECR.
-   
-2. Create a new ECS cluster to run services.
-  
-3. Create a new ECS service from the `web_ECS/` directory? to run the model training pipeline image in ECR using Faregate.
 
-4. Deploy the task in the ECS cluster and wait for the pipeline to deploy and run.
+1. Create AWS Lambda function to preprocess user uploaded image for model inference.
 
-... Yeah I don't know how you did this. Gabe! Help!
+2. Make the web app to load model from the S3 bucket dynamically, and invoke Lambda function using boto3 in Python when received a new image.
 
-Do y'all think we should include the video in the repo and link to it here?
+2. Build and push docker image of the web app in the `app` directory to ECR.
 
+3. Create a new ECS cluster for app hosting and model inference.
 
-#### Run Dockerfile for web app 
-```
-docker build -t fer-app -f dockerfiles/Dockerfile-app .
-docker run -p 80:80 fer-app
-```
+4. Define task and deploy it as service with necessary permissions, port mappings, and networking security group.
+
+6. Access the app from the public IP, and upload facial images to get emotion prediction.
