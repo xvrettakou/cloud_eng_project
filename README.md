@@ -10,14 +10,31 @@ Addressing mental health concerns has become increasingly important in the persi
 ## Architecture
 ![Architecture](./images/CloudEngineering.png)
 
-Our architecture can be easily split into thre processes:
+Our architecture can be easily split into three processes:
+
 **1. Training Data Augmentation** - When an image training data set is uploaded to the S3 Raw bucket, a lambda function is triggered to ingest that dataset, create an augmented image dataset, and upload the resulting augmented dataset to the S3 Refined bucket.
+
 **2. Model Training** - The model training pipeline is containerized in ECR and can be deployed as an ECS task to ingest an augmented dataset from the S3 Refined bucket, train, evaluate, and score a model, and uploaded a pickled model and related artifacts to the S3 Model Storage bucket.
+
 **3. Inference Web Application** - The web application is deployed as a streamlit app containerized in an ECS service. A user can upload a raw image to the web app that the service will send to a lambda function for preprocessing. The preprocessed image is then returned to the ECS service, which pulls a model from the S3 Model Storage bucket, predicts an emotion from the given image, and returns the inferred emotion to be displayed on the web app to the user.
 
 Here is a link to our cost estimation for this architecture: ***link***
 
-## Repos Overview
+## Repository Overview
+This repository contains all the code necessary to deploy on AWS the architecture previously described. The contents of the repository are detailed below:
+
+- `app/`: The directory containing the script and resources for running the streamlit web application.
+- `config/`: Do we need to delete this one?
+- `dockerfiles/`: The directory containg dockerfiles for building either the pipeline or the test as an image.
+- `logs/`: The directory containing the pipeline's saved logs.
+- `runs/`: The directory containing artifact folders marked by timestamp for each of the pipeline's runs. Each folder contains the artifact files produced by a run. If it does not exist yet, it will be created during the first run.
+- `src/`: The directory containg all the module called by the pipeline.
+- `tests/`: The directory containing the unit test script for the pipeline. Can be called using `pytest -v`.
+- `.pylintrc`: The file containing the lintr standard configurations for this repository.
+- `requirements.txt`: The file listing the dependencies for the pipeline.
+- `README.md`: The README you're reading right now.
+
+
 
 ## Deployment Overview
 
