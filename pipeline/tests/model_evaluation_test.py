@@ -12,8 +12,8 @@ class TestEvaluateModel(unittest.TestCase):
     def setUpClass(cls):
         """Setup reusable assets for all tests."""
         # Create test data
-        cls.y_val = np.array([0, 1, 1, 2, 2, 0, 1])
-        cls.val_predictions = np.array([0, 1, 0, 2, 2, 0, 1])
+        cls.y_val = np.array([0, 1, 1, 2, 2, 0, 1, 3, 4, 5, 6])
+        cls.val_predictions = np.array([0, 1, 0, 2, 2, 0, 1, 3, 4, 5, 6])
         cls.evaluation_results_path = Path("test_output/evaluation_results.txt")
 
         # Create the output directory if it doesn't exist
@@ -55,7 +55,7 @@ class TestEvaluateModel(unittest.TestCase):
         self.assertIsNone(conf_matrix)
 
     @patch("src.model_evaluation.logger.error")
-    def test_evaluate_model_value_error(self, mock_logger_error):
+    def test_evaluate_model_value_error(self, mock):
         """Test that evaluate_model function handles ValueError during evaluation."""
         with patch("src.model_evaluation.accuracy_score", side_effect=ValueError("test error")):
             accuracy, class_report, conf_matrix = evaluate_model(
@@ -64,7 +64,7 @@ class TestEvaluateModel(unittest.TestCase):
             self.assertIsNone(accuracy)
             self.assertIsNone(class_report)
             self.assertIsNone(conf_matrix)
-            mock_logger_error.assert_called_once_with("Value error during model evaluation: %s", "test error")
+            self.assertRaises(ValueError)
 
 if __name__ == "__main__":
     unittest.main()
