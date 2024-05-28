@@ -1,6 +1,5 @@
 import json
 import base64
-import boto3
 import numpy as np
 from PIL import Image
 from io import BytesIO
@@ -11,7 +10,7 @@ def resize_image(image, target_size=(48, 48)):
     scaling_factor = min(target_width / original_width, target_height / original_height)
     new_width = int(original_width * scaling_factor)
     new_height = int(original_height * scaling_factor)
-    resized_image = image.resize((new_width, new_height), Image.ANTIALIAS)
+    resized_image = image.resize((new_width, new_height), Image.LANCZOS)
     new_image = Image.new("L", target_size)
     new_image.paste(resized_image, ((target_width - new_width) // 2, (target_height - new_height) // 2))
     return new_image
@@ -20,6 +19,7 @@ def lambda_handler(event, context):
     try:
         # Extract base64 encoded image data from the event
         image_data = event['image_data']
+        # Decode the base64 encoded image data to bytes
         image_data = base64.b64decode(image_data)
         
         # Load the image from bytes
