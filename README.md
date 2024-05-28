@@ -25,16 +25,17 @@ This repository contains all the code necessary to deploy on AWS the architectur
 
 - `app/`: The directory containing the script and resources for running the streamlit web application.
 - `config/`: Do we need to delete this one?
-- `dockerfiles/`: The directory containg dockerfiles for building either the pipeline or the test as an image.
-- `logs/`: The directory containing the pipeline's saved logs.
-- `runs/`: The directory containing artifact folders marked by timestamp for each of the pipeline's runs. Each folder contains the artifact files produced by a run. If it does not exist yet, it will be created during the first run.
-- `src/`: The directory containg all the module called by the pipeline.
-- `tests/`: The directory containing the unit test script for the pipeline. Can be called using `pytest -v`.
+- `dockerfiles/`: The directory containg dockerfiles for building the web app.
+- `images/`: The directory containg images referenced in this README.
+- `pipeline/`: The directory containing the model training pipeline scripts and associated resources including specifc configuration files, logs, unit tests, modules, requirements, and Dockerfile.
+- `preprocessing_lambda/`: The directory containing the script used to augment training data.
+- `src/`: I think we need to delete this
+- `tests/`: I think we need to delete this
+- `.gitignore`: The file detailing untracked files Git should ignore.
 - `.pylintrc`: The file containing the lintr standard configurations for this repository.
-- `requirements.txt`: The file listing the dependencies for the pipeline.
 - `README.md`: The README you're reading right now.
-
-
+- `pipeline_model.py`: I think we need to delete this.
+- `requirements.txt`: I think we need to delete this.
 
 ## Deployment Overview
 
