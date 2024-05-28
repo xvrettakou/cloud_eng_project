@@ -24,7 +24,7 @@ Our architecture can be easily split into three processes:
 This repository contains all the code necessary to deploy on AWS the architecture previously described. The contents of the repository are detailed below:
 
 - `app/`: The directory containing the script and resources for running the streamlit web application.
-- `config/`: Do we need to delete this one?
+- `config/`: Do we need to delete this one? ******************************
 - `dockerfiles/`: The directory containg dockerfiles for building the web app.
 - `images/`: The directory containg images referenced in this README.
 - `pipeline/`: The directory containing the model training pipeline scripts and associated resources:
@@ -35,13 +35,9 @@ This repository contains all the code necessary to deploy on AWS the architectur
   - `Dockerfile`: The Dockerfile for building the model training pipeline imgae.
   - `requirements.txt`: The model training pipeline package requirements.
 - `preprocessing_lambda/`: The directory containing the script used to augment training data.
-- `src/`: I think we need to delete this
-- `tests/`: I think we need to delete this
 - `.gitignore`: The file detailing untracked files Git should ignore.
 - `.pylintrc`: The file containing the lintr standard configurations for this repository.
 - `README.md`: The README you're reading right now.
-- `pipeline_model.py`: I think we need to delete this.
-- `requirements.txt`: I think we need to delete this.
 
 ### Pipeline Unittests
 To run the pipeline unittests, navigate to the pipeline folder and run the following line of code:
