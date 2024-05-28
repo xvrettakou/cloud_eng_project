@@ -20,6 +20,10 @@ Our architecture can be easily split into three processes:
 
 [Link to our cost estimation for this architecture.](https://calculator.aws/#/estimate?id=b1b1ae6e15b5c739a3bd9e2c219bd8ac910979f6)
 
+### Data
+To train our model, we found a [Kaggle dataset for facial emotional recognition](https://www.kaggle.com/competitions/challenges-in-representation-learning-facial-expression-recognition-challenge/overview).
+
+
 ## Repository Overview
 This repository contains all the code necessary to deploy on AWS the architecture previously described. The contents of the repository are detailed below:
 
