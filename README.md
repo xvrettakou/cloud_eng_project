@@ -43,6 +43,15 @@ This repository contains all the code necessary to deploy on AWS the architectur
 - `pipeline_model.py`: I think we need to delete this.
 - `requirements.txt`: I think we need to delete this.
 
+### Pipeline Unittests
+To run the pipeline unittests, navigate to the pipeline folder and run the following line of code:
+```
+python -m unittest discover -s tests -p '*test*.py'
+```
+To receive this result:
+
+![Unit Tests](./images/pipeline_unittest.png)
+
 ## Deployment Overview
 The steps for deploying 
 
