@@ -41,6 +41,8 @@ This repository contains all the code necessary to deploy on AWS the architectur
 The steps for deploying 
 
 ### Training Data Augmentation
+![Phase1](./images/phase1.png)
+
 1. Create a lambda function with S3 permissions for the execution role, the `preprocessing_lambda/main.py` script, a trigger on created objects in the S3 Raw bucket, 3004 MB memory, and 2048 MB ephemeral storage.
 
 ![Augmentation Lambda Function](./images/augmenting_lambda_config.png)
@@ -52,6 +54,8 @@ The steps for deploying
 ![Augmented Dataset](./images/augmented_data.png)
 
 ### Model Training
+![Phase2](./images/phase2.png)
+
 1. Create a new ECR registry and use the push commands from the `pipeline/` directory to build and push the model training pipeline to ECR.
    
 2. Create a new ECS cluster to run tasks.
@@ -67,6 +71,8 @@ During that process, the trained model and associated artifacts will be uploaded
 ![Model Training Artifacts](./images/model_artifacts.png)
 
 ### Inference Web Application
+![Phase3](./images/phase3.png)
+
 1. Create a new ECR registry and use the push commands from the `pipeline/` directory to build and push the model training pipeline to ECR.
    
 2. Create a new ECS cluster to run services.
