@@ -2,18 +2,19 @@
 import json
 import base64
 from io import BytesIO
+from typing import Tuple, Dict, Any
 import numpy as np
 from PIL import Image
 
-def resize_image(image, target_size=(48, 48)):
+def resize_image(image: Image.Image, target_size: Tuple[int, int] = (48, 48)) -> Image.Image:
     """Resize the image to the target size without distortion.
     
     Args:
-        image (PIL.Image): The original image.
+        image (PIL.Image.Image): The original image.
         target_size (tuple): The target size as (width, height).
     
     Returns:
-        PIL.Image: The resized image.
+        PIL.Image.Image: The resized image.
     """
     original_width, original_height = image.size
     target_width, target_height = target_size
@@ -25,7 +26,7 @@ def resize_image(image, target_size=(48, 48)):
     new_image.paste(resized_image, ((target_width - new_width) // 2, (target_height - new_height) // 2))
     return new_image
 
-def lambda_handler(event, _context):
+def lambda_handler(event: Dict[str, Any], _context: Any) -> Dict[str, Any]:
     """AWS Lambda handler function to process the image.
     
     Args:
