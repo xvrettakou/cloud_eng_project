@@ -28,7 +28,6 @@ To train our model, we found a [Kaggle dataset for facial emotional recognition]
 This repository contains all the code necessary to deploy on AWS the architecture previously described. The contents of the repository are detailed below:
 
 - `app/`: The directory containing the script and resources for running the streamlit web application.
-- `config/`: Do we need to delete this one? ******************************
 - `dockerfiles/`: The directory containg dockerfiles for building the web app.
 - `images/`: The directory containg images referenced in this README.
 - `pipeline/`: The directory containing the model training pipeline scripts and associated resources:
