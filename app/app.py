@@ -1,4 +1,5 @@
 import logging
+import os
 import boto3
 import joblib
 import tensorflow as tf
@@ -12,12 +13,19 @@ import utils
 
 logging.basicConfig(level=logging.INFO)
 lambda_client = boto3.client('lambda')
-lambda_function_name = "Inference-ImageProcess"
-bucket_name = "cloud-engineering-proj"
+lambda_function_name = os.getenv("LAMBDA_FUNCTION_NAME", "Inference-ImageProcess")
+bucket_name = os.getenv("BUCKET_NAME", "cloud-project-artifact")
 
 
 # Define the emotion labels
-emotion_labels = ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']
+emotion_labels = [
+    'Angry',
+    'Disgust',
+    'Fear',
+    'Happy',
+    'Sad',
+    'Surprise',
+    'Neutral']
 
 
 # Load the trained model
@@ -35,7 +43,10 @@ def load_model(version):
     try:
         if version == "Random Forest":
             s3_key = "trained_model.pkl"
-            utils.download_model(bucket_name, s3_key, s3_key)
+            utils.download_model(
+                bucket_name,
+                "artifacts/trained_model.pkl/" + s3_key,
+                s3_key)
 
             with open("trained_model.pkl", "rb") as file:
                 model = joblib.load(file)
@@ -67,11 +78,16 @@ image = None
 
 
 # Option selection
-option = st.radio("Choose your image source:", ('Upload an Image', 'Capture from Webcam'))
+option = st.radio(
+    "Choose your image source:",
+    ('Upload an Image',
+     'Capture from Webcam'))
 
 if option == 'Upload an Image':
     # File uploader allows user to add their own image
-    uploaded_file = st.file_uploader("Choose an image...", type=['jpg', 'jpeg', 'png'])
+    uploaded_file = st.file_uploader(
+        "Choose an image...", type=[
+            'jpg', 'jpeg', 'png'])
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
         st.image(image, caption='Uploaded Image.')
@@ -85,12 +101,12 @@ elif option == 'Capture from Webcam':
 
 if image is not None:
     encoded = utils.encode_image(image)
-    response = utils.invoke_lambda(lambda_client, encoded, lambda_function_name)
+    response = utils.invoke_lambda(
+        lambda_client, encoded, lambda_function_name)
 
     if response["statusCode"] == 200:
         decoded = utils.decode_image(response)
         image = Image.open(BytesIO(decoded))
-
 
 
 if image is not None and model is not None:
