@@ -18,7 +18,7 @@ Our architecture can be easily split into three processes:
 
 **3. Inference Web Application** - The web application is deployed as a streamlit app containerized in an ECS service. A user can upload a raw image to the web app that the service will send to a lambda function for preprocessing. The preprocessed image is then returned to the ECS service, which pulls a model from the S3 Model Storage bucket, predicts an emotion from the given image, and returns the inferred emotion to be displayed on the web app to the user.
 
-Here is a link to our cost estimation for this architecture: ***link***
+[Link to our cost estimation for this architecture.](https://calculator.aws/#/estimate?id=b1b1ae6e15b5c739a3bd9e2c219bd8ac910979f6)
 
 ## Repository Overview
 This repository contains all the code necessary to deploy on AWS the architecture previously described. The contents of the repository are detailed below:
@@ -27,7 +27,13 @@ This repository contains all the code necessary to deploy on AWS the architectur
 - `config/`: Do we need to delete this one?
 - `dockerfiles/`: The directory containg dockerfiles for building the web app.
 - `images/`: The directory containg images referenced in this README.
-- `pipeline/`: The directory containing the model training pipeline scripts and associated resources including specifc configuration files, logs, unit tests, modules, requirements, and Dockerfile.
+- `pipeline/`: The directory containing the model training pipeline scripts and associated resources:
+  - `config/`: The directory containing the model training pipeline configuration files.
+  - `logs/`: The directory containing the model training pipeline log files.
+  - `src/`: The directory containing the model training pipeline python module scripts and the `main.py` script.
+  - `tests/`: The directory containing the model training pipeline unit tests.
+  - `Dockerfile`: The Dockerfile for building the model training pipeline imgae.
+  - `requirements.txt`: The model training pipeline package requirements.
 - `preprocessing_lambda/`: The directory containing the script used to augment training data.
 - `src/`: I think we need to delete this
 - `tests/`: I think we need to delete this
