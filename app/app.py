@@ -17,7 +17,14 @@ bucket_name = "cloud-engineering-proj"
 
 
 # Define the emotion labels
-emotion_labels = ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']
+emotion_labels = [
+    'Angry',
+    'Disgust',
+    'Fear',
+    'Happy',
+    'Sad',
+    'Surprise',
+    'Neutral']
 
 
 # Load the trained model
@@ -67,11 +74,16 @@ image = None
 
 
 # Option selection
-option = st.radio("Choose your image source:", ('Upload an Image', 'Capture from Webcam'))
+option = st.radio(
+    "Choose your image source:",
+    ('Upload an Image',
+     'Capture from Webcam'))
 
 if option == 'Upload an Image':
     # File uploader allows user to add their own image
-    uploaded_file = st.file_uploader("Choose an image...", type=['jpg', 'jpeg', 'png'])
+    uploaded_file = st.file_uploader(
+        "Choose an image...", type=[
+            'jpg', 'jpeg', 'png'])
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
         st.image(image, caption='Uploaded Image.')
@@ -85,12 +97,12 @@ elif option == 'Capture from Webcam':
 
 if image is not None:
     encoded = utils.encode_image(image)
-    response = utils.invoke_lambda(lambda_client, encoded, lambda_function_name)
+    response = utils.invoke_lambda(
+        lambda_client, encoded, lambda_function_name)
 
     if response["statusCode"] == 200:
         decoded = utils.decode_image(response)
         image = Image.open(BytesIO(decoded))
-
 
 
 if image is not None and model is not None:
