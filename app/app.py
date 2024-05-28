@@ -2,7 +2,6 @@ import logging
 import os
 import boto3
 import joblib
-import tensorflow as tf
 import streamlit as st
 from PIL import Image
 from io import BytesIO
@@ -12,7 +11,7 @@ import utils
 
 
 logging.basicConfig(level=logging.INFO)
-lambda_client = boto3.client('lambda')
+lambda_client = boto3.client('lambda', region_name='us-east-2')
 lambda_function_name = os.getenv("LAMBDA_FUNCTION_NAME", "Inference-ImageProcess")
 bucket_name = os.getenv("BUCKET_NAME", "cloud-project-artifact")
 
@@ -50,10 +49,10 @@ def load_model(version):
 
             with open("trained_model.pkl", "rb") as file:
                 model = joblib.load(file)
-        elif version == "CNN":
-            s3_key = "baseline_epochs=100.h5"
-            utils.download_model(bucket_name, s3_key, s3_key)
-            model = tf.keras.models.load_model(s3_key)
+        # elif version == "CNN":
+        #     s3_key = "baseline_epochs=100.h5"
+        #     utils.download_model(bucket_name, s3_key, s3_key)
+        #     model = tf.keras.models.load_model(s3_key)
     except FileNotFoundError as e:
         logging.error("Model file not found: %s", e)
     except Exception as e:
@@ -66,12 +65,7 @@ st.title('Facial Expression Recognition', anchor=False)
 st.caption("This app uses a trained model to classify facial expressions into one of seven emotions: Angry, Disgust, Fear, Happy, Sad, Surprise, and Neutral.")
 st.subheader('Select an image source to proceed:', anchor=False)
 
-
-# Sidebar for model selection
-st.sidebar.title("Model Selection")
-model_version = st.sidebar.selectbox(
-    "Select Model Version", [
-        "Random Forest", "CNN"])
+model_version = "Random Forest"
 
 model = load_model(model_version)
 image = None
