@@ -6,7 +6,8 @@ project_info:
   dependencies: requirements.txt
 
 model_training:
-  data_path: "wqj1453-cloud-project/train.csv"  # Path to the training data
+  data_path: "cloud-project-refined/train.csv"  # Path to the training data
+  model_save_path: "cloud-project-artifact"   # Directory where the trained model will be saved
   test_size: 0.2                               # Proportion of data to be used for validation
   random_state: 42                             # Random state for reproducibility
   stratify: True                               # Whether to stratify the split based on the labels
@@ -20,9 +21,8 @@ model_evaluation:
     - classification_rep: true
 
 aws:
-  data_bucket_name: wqj1453-cloud-project # S3 bucket for refined data
-  artifacts_bucket_name: wqj1453-artifacts-project # S3 bucket for storing artifacts
-  aws_profile: nustudent-sso
+  data_bucket_name: cloud-project-refined # S3 bucket for refined data
+  artifacts_bucket_name: cloud-project-artifact # S3 bucket for storing artifacts
   upload: true
 
 run_config:

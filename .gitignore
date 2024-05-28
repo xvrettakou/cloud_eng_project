@@ -7,3 +7,6 @@ Attempt2_image_analysis.ipynb
 .venv/*
 .Rhistory
 logs/*
+output_runs/*
+pipeline/output_runs/*
+app/test.ipynb
