@@ -104,6 +104,8 @@ if image is not None:
 
 
 if image is not None and model is not None:
+    logging.info("Making prediction")
+
     if isinstance(model, BaseEstimator):
         img_array = np.array(image).reshape(1, -1)
         prediction = model.predict(img_array)[0]

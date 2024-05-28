@@ -20,6 +20,7 @@ def download_model(bucket_name, s3_key, local_path):
 
 
 def encode_image(image):
+    logging.info("Encoding image")
     buffered = BytesIO()
     image.save(buffered, format="PNG")
     img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
@@ -27,6 +28,7 @@ def encode_image(image):
 
 
 def invoke_lambda(client, image_data, lambda_function_name):
+    logging.info("Invoking Lambda to process the image")
     payload = {
         'image_data': image_data
     }
@@ -42,5 +44,6 @@ def invoke_lambda(client, image_data, lambda_function_name):
 
 
 def decode_image(response):
+    logging.info("Decoding image")
     encoded = json.loads(response["body"])["standardized_image_data"]
     return base64.b64decode(encoded)
