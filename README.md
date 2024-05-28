@@ -1,13 +1,18 @@
 # How are you feeling?
-Cloud Engineering Final Project
+#### Cloud Engineering Final Project
 
 Contributors: Gabriel Zhang, Kate Yee, Xenia Vrettakou & Zoe Li
 
+## Purpose
+Addressing mental health concerns has become increasingly important in the persisting isolation of the post-pandemic period. Our goal for this project was to create a cloud based web app to enable early detection of emotional distress to proactively provide students with counselling services.
+
+
 ## Architecture
-
 ![Architecture](./images/CloudEngineering.png)
+Our architecture 
 
-Cost Estimation:
+
+Cost Estimation: ***link***
 
 ## Repos Overview
 
