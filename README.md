@@ -8,7 +8,7 @@ Addressing mental health concerns has become increasingly important in the persi
 
 
 ## Architecture
-![Architecture](./images/CloudEngineering.png)
+![Architecture](./images/architecture.png)
 
 Our architecture can be easily split into three processes:
 
@@ -38,12 +38,47 @@ This repository contains all the code necessary to deploy on AWS the architectur
 - `requirements.txt`: I think we need to delete this.
 
 ## Deployment Overview
+The steps for deploying 
 
-### Preprocessing Lambda
+### Training Data Augmentation
+1. Create a lambda function with S3 permissions for the execution role, the `preprocessing_lambda/main.py` script, a trigger on created objects in the S3 Raw bucket, 3004 MB memory, and 2048 MB ephemeral storage.
+
+![Augmentation Lambda Function](./images/augmenting_lambda_config.png)
+
+2. Add three layers to the function to enable the pandas, numpy, and pillow libraries using [these ARN's](https://api.klayers.cloud/api/v2/p3.12/layers/latest/us-east-2/html).
+
+3. Upload a training data csv to the S3 Raw bucket and wait for the augmented data csv to appear in the S3 Refined bucket.
+
+![Augmented Dataset](./images/augmented_data.png)
 
 ### Model Training
+1. Create a new ECR registry and use the push commands from the `pipeline/` directory to build and push the model training pipeline to ECR.
+   
+2. Create a new ECS cluster to run tasks.
+  
+3. Create a new task definiion to run the model training pipeline image in ECR using Faregate.
 
-### Web Application
+4. Deploy the task in the ECS cluster and wait for the pipeline to deploy and run.
+
+![Model Training Pipeline Completion](./images/model_pipeline_completion.png)
+
+During that process, the trained model and associated artifacts will be uploaded to the S3 Model Storage bucket.
+
+![Model Training Artifacts](./images/model_artifacts.png)
+
+### Inference Web Application
+1. Create a new ECR registry and use the push commands from the `pipeline/` directory to build and push the model training pipeline to ECR.
+   
+2. Create a new ECS cluster to run services.
+  
+3. Create a new ECS service from the `web_ECS/` directory? to run the model training pipeline image in ECR using Faregate.
+
+4. Deploy the task in the ECS cluster and wait for the pipeline to deploy and run.
+
+... Yeah I don't know how you did this. Gabe! Help!
+
+Do y'all think we should include the video in the repo and link to it here?
+
 
 #### Run Dockerfile for web app 
 ```
