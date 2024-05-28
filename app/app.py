@@ -1,4 +1,5 @@
 import logging
+import os
 import boto3
 import joblib
 import tensorflow as tf
@@ -12,8 +13,8 @@ import utils
 
 logging.basicConfig(level=logging.INFO)
 lambda_client = boto3.client('lambda')
-lambda_function_name = "Inference-ImageProcess"
-bucket_name = "cloud-engineering-proj"
+lambda_function_name = os.getenv("LAMBDA_FUNCTION_NAME", "Inference-ImageProcess")
+bucket_name = os.getenv("BUCKET_NAME", "cloud-project-artifact")
 
 
 # Define the emotion labels
@@ -42,7 +43,10 @@ def load_model(version):
     try:
         if version == "Random Forest":
             s3_key = "trained_model.pkl"
-            utils.download_model(bucket_name, s3_key, s3_key)
+            utils.download_model(
+                bucket_name,
+                "artifacts/trained_model.pkl/" + s3_key,
+                s3_key)
 
             with open("trained_model.pkl", "rb") as file:
                 model = joblib.load(file)

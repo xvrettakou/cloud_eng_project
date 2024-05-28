@@ -9,11 +9,11 @@ logging.basicConfig(level=logging.INFO)
 
 
 def download_model(bucket_name, s3_key, local_path):
-    """Download refined data from S3."""
+    """Download model from S3."""
     s3 = boto3.client("s3")
     try:
         s3.download_file(bucket_name, s3_key, str(local_path))
-        logging.info("Downloaded refined data from S3.")
+        logging.info("Downloaded model from S3.")
     except Exception as e:
         logging.error("Error downloading refined data from S3: %s", e)
         raise
