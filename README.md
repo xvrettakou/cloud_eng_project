@@ -39,6 +39,7 @@ This repository contains all the code necessary to deploy on AWS the architectur
   - `Dockerfile`: The Dockerfile for building the model training pipeline imgae.
   - `requirements.txt`: The model training pipeline package requirements.
 - `preprocessing_lambda/`: The directory containing the script used to augment training data.
+- `preprocessing_lambda_inference/`: The directory containing the script used to augment user uploaded data for inference.
 - `.gitignore`: The file detailing untracked files Git should ignore.
 - `.pylintrc`: The file containing the lintr standard configurations for this repository.
 - `README.md`: The README you're reading right now.

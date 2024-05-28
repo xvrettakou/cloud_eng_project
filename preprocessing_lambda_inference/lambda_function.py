@@ -6,8 +6,7 @@ import numpy as np
 from PIL import Image
 
 def resize_image(image, target_size=(48, 48)):
-    """
-    Resize the image to the target size without distortion.
+    """Resize the image to the target size without distortion.
     
     Args:
         image (PIL.Image): The original image.
@@ -27,8 +26,7 @@ def resize_image(image, target_size=(48, 48)):
     return new_image
 
 def lambda_handler(event, _context):
-    """
-    AWS Lambda handler function to process the image.
+    """AWS Lambda handler function to process the image.
     
     Args:
         event (dict): The event payload containing base64 image data.
